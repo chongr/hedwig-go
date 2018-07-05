@@ -93,6 +93,21 @@ func TestValidateValid(t *testing.T) {
 	assert.Nil(t, err)
 }
 
+func TestInvalidateInvalidMinorVersion(t *testing.T) {
+	settings := createTestSettings()
+	validator := settings.Validator
+	msgDataType := "vehicle_created"
+	msgDataSchemaVersion := "1.9"
+	data := FakeHedwigDataField{
+		VehicleID: "C_1234567890123456",
+	}
+	message, err := NewMessage(settings, msgDataType, msgDataSchemaVersion, map[string]string{}, &data)
+	require.NoError(t, err)
+
+	err = validator.Validate(message)
+	assert.NotNil(t, err)
+}
+
 func TestValidateInvalidSchema(t *testing.T) {
 	settings := createTestSettings()
 	validator := settings.Validator
