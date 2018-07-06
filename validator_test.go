@@ -108,6 +108,44 @@ func TestInvalidateInvalidMinorVersion(t *testing.T) {
 	assert.NotNil(t, err)
 }
 
+func TestInvalidNoXVersions(t *testing.T) {
+	assertions := assert.New(t)
+	schemaMissingXversions := `
+	{
+		"id": "https://hedwig.automatic.com/schema",
+		"$schema": "http://json-schema.org/draft-04/schema#",
+		"description": "Test Schema for Hedwig messages",
+		"schemas": {
+			"trip_created": {
+				"1": {
+					"description": "This is a message type",
+					"type": "object",
+					"required": [
+						"vehicle_id",
+						"user_id"
+					],
+					"properties": {
+						"vehicle_id": {
+							"type": "string"
+						},
+						"user_id": {
+							"type": "string"
+						},
+						"vin": {
+							"type": "string"
+						}
+					}
+				}
+			}
+		}
+	}
+	`
+	v, err := NewMessageValidatorFromBytes([]byte(schemaMissingXversions))
+	assertions.Nil(v)
+	assertions.NotNil(err)
+	assertions.Equal("x-versions not defined for message for schemaURL: https://hedwig.automatic.com/schema/schemas/trip_created/1", err.Error())
+}
+
 func TestValidateInvalidSchema(t *testing.T) {
 	settings := createTestSettings()
 	validator := settings.Validator
